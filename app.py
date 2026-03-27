@@ -17,7 +17,7 @@ if file:
     st.image(img, caption='Tvůj sešit', use_column_width=True)
     
     if st.button("🧠 Analyzovat zápisky"):
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro-vision')
         with st.spinner('AI čte tvůj sešit...'):
             response = model.generate_content([
                 "Přečti tyhle zápisky v češtině. Udělej stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
