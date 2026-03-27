@@ -5,11 +5,13 @@ from PIL import Image
 # Nastavení AI - tvůj klíč
 genai.configure(api_key="AIzaSyBJvt1LTgSLgzQ-nYAuaIrZurSBAssC6QU")
 
+# Nastavení vzhledu stránky
 st.set_page_config(page_title="AI Study Buddy", layout="centered")
 
 st.title("🎓 AI Study Buddy")
 st.write("Nahraj fotku svých zápisků a já ti udělám výtah.")
 
+# Nahrávání souboru
 file = st.file_uploader("Vyber fotku sešitu", type=["jpg", "png", "jpeg"])
 
 if file:
@@ -17,18 +19,23 @@ if file:
     st.image(img, caption='Tvůj sešit', use_column_width=True)
     
     if st.button("🧠 Analyzovat zápisky"):
-        # ZMĚNA MODELU NA STABILNĚJŠÍ VERZI
-        model = genai.GenerativeModel('gemini-1.0-pro-vision-latest') 
+        # Použití nejnovějšího modelu pro rok 2026
+        model = genai.GenerativeModel('gemini-1.5-flash') 
         
         with st.spinner('AI čte tvůj sešit a přemýšlí...'):
             try:
-                # Drobná úprava příkazu (promptu)
+                # Odeslání textového příkazu i obrázku najednou
                 response = model.generate_content([
-                    "Přečti tyhle ručně psané poznámky. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
+                    "Přečti tyhle ručně psané poznámky v češtině. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
                     img
                 ])
+                
+                # Zobrazení výsledku
                 st.markdown("---")
-                st.markdown(response.text)
+                st.subheader("📝 Výsledek analýzy:")
+                st.write(response.text)
+                
             except Exception as e:
-                # Pokud to i tak hodí chybu, vypíše ji srozumitelněji
+                # Ošetření chyb (např. špatný region nebo klíč)
                 st.error(f"Chyba při komunikaci s AI: {e}")
+                
