@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 
-# Nastavení AI - tvůj klíč
+# Nastavení AI - tvůj klíč (necháváme stejný, ten je v pořádku)
 genai.configure(api_key="AIzaSyBJvt1LTgSLgzQ-nYAuaIrZurSBAssC6QU")
 
 st.set_page_config(page_title="AI Study Buddy", layout="centered")
@@ -17,28 +17,22 @@ if file:
     st.image(img, caption='Tvůj sešit', use_column_width=True)
     
     if st.button("🧠 Analyzovat zápisky"):
-        with st.spinner('AI hledá nejlepší model a čte tvůj sešit...'):
+        with st.spinner('AI čte tvůj sešit a přemýšlí...'):
             try:
-                # Pokusíme se použít nejmodernější dostupný model
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                # KLÍČOVÁ OPRAVA: Přidáváme 'models/' před název
+                model = genai.GenerativeModel('models/gemini-1.5-flash')
                 
-                # Instrukce pro AI
-                prompt = "Přečti tyhle ručně psané poznámky v češtině. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení."
-                
-                # Spuštění analýzy
-                response = model.generate_content([prompt, img])
+                # Odeslání požadavku
+                response = model.generate_content([
+                    "Přečti tyhle ručně psané poznámky v češtině. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
+                    img
+                ])
                 
                 st.markdown("---")
                 st.subheader("📝 Výsledek od AI:")
                 st.write(response.text)
                 
             except Exception as e:
-                # Pokud 1.5-flash selže (chyba 404), zkusíme starší verzi
-                try:
-                    model_backup = genai.GenerativeModel('gemini-pro-vision')
-                    response = model_backup.generate_content([prompt, img])
-                    st.markdown("---")
-                    st.subheader("📝 Výsledek od AI (záložní model):")
-                    st.write(response.text)
-                except Exception as e2:
-                    st.error(f"Omlouvám se, ani jeden model teď neodpovídá. Chyba: {e2}")
+                # Pokud by to pořád házelo chybu, vypíše nám to přesný důvod
+                st.error(f"Technický problém: {e}")
+                
