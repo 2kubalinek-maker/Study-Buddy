@@ -17,12 +17,18 @@ if file:
     st.image(img, caption='Tvůj sešit', use_column_width=True)
     
     if st.button("🧠 Analyzovat zápisky"):
-        model = genai.GenerativeModel('gemini-pro-vision')
-        with st.spinner('AI čte tvůj sešit...'):
-            response = model.generate_content([
-                "Přečti tyhle zápisky v češtině. Udělej stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
-                img
-            ])
-            st.markdown("---")
-            st.markdown(response.text)
-          
+        # ZMĚNA MODELU NA STABILNĚJŠÍ VERZI
+        model = genai.GenerativeModel('gemini-1.0-pro-vision-latest') 
+        
+        with st.spinner('AI čte tvůj sešit a přemýšlí...'):
+            try:
+                # Drobná úprava příkazu (promptu)
+                response = model.generate_content([
+                    "Přečti tyhle ručně psané poznámky. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
+                    img
+                ])
+                st.markdown("---")
+                st.markdown(response.text)
+            except Exception as e:
+                # Pokud to i tak hodí chybu, vypíše ji srozumitelněji
+                st.error(f"Chyba při komunikaci s AI: {e}")
