@@ -33,7 +33,7 @@ if file:
                 st.write(response.text)
                 
             except Exception as e:
-                # Pokud 1.5-flash selže (chyba 404), zkusíme verzi 1.0
+                # Pokud 1.5-flash selže (chyba 404), zkusíme starší verzi
                 try:
                     model_backup = genai.GenerativeModel('gemini-pro-vision')
                     response = model_backup.generate_content([prompt, img])
