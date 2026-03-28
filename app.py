@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 
-# Nastavení AI - tvůj klíč (necháváme stejný, ten je v pořádku)
+# Nastavení AI - tvůj klíč
 genai.configure(api_key="AIzaSyBJvt1LTgSLgzQ-nYAuaIrZurSBAssC6QU")
 
 st.set_page_config(page_title="AI Study Buddy", layout="centered")
@@ -17,12 +17,12 @@ if file:
     st.image(img, caption='Tvůj sešit', use_column_width=True)
     
     if st.button("🧠 Analyzovat zápisky"):
-        with st.spinner('AI čte tvůj sešit a přemýšlí...'):
+        with st.spinner('AI čte tvůj sešit...'):
             try:
-                # KLÍČOVÁ OPRAVA: Přidáváme 'models/' před název
-                model = genai.GenerativeModel('models/gemini-1.5-flash')
+                # Tady je ta změna: vynutíme přesný název modelu
+                model = genai.GenerativeModel(model_name='gemini-1.5-flash')
                 
-                # Odeslání požadavku
+                # Posíláme seznam: [textový prompt, obrázek]
                 response = model.generate_content([
                     "Přečti tyhle ručně psané poznámky v češtině. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
                     img
@@ -30,9 +30,11 @@ if file:
                 
                 st.markdown("---")
                 st.subheader("📝 Výsledek od AI:")
-                st.write(response.text)
+                if response.text:
+                    st.write(response.text)
+                else:
+                    st.write("AI přečetla obrázek, ale nevygenerovala žádný text.")
                 
             except Exception as e:
-                # Pokud by to pořád házelo chybu, vypíše nám to přesný důvod
-                st.error(f"Technický problém: {e}")
-                
+                # Detailní výpis chyby, abychom věděli, co přesně se děje
+                st.error(f"Chyba: {e}") 
