@@ -1,40 +1,46 @@
 import streamlit as st
 import google.generativeai as genai
-from PIL import Image
 
 # Nastavení AI - tvůj klíč
 genai.configure(api_key="AIzaSyBJvt1LTgSLgzQ-nYAuaIrZurSBAssC6QU")
 
-st.set_page_config(page_title="AI Study Buddy", layout="centered")
+st.set_page_config(page_title="AI Studijní Pomocník", layout="centered")
 
-st.title("🎓 AI Study Buddy")
-st.write("Nahraj fotku svých zápisků a já ti udělám výtah.")
+st.title("⚡ AI Studijní Pomocník")
+st.write("Vlož text z učebnice a já z něj udělám podklady pro učení.")
 
-file = st.file_uploader("Vyber fotku sešitu", type=["jpg", "png", "jpeg"])
+# Textové pole pro vložení učiva
+user_text = st.text_area("Sem vlož text (témata, poznámky, články):", height=200)
 
-if file:
-    img = Image.open(file)
-    st.image(img, caption='Tvůj sešit', use_column_width=True)
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    btn_summary = st.button("📝 Udělat výtah")
+with col2:
+    btn_quiz = st.button("❓ Vytvořit kvíz")
+with col3:
+    btn_points = st.button("🏷️ Klíčové body")
+
+if user_text:
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
-    if st.button("🧠 Analyzovat zápisky"):
-        with st.spinner('AI čte tvůj sešit...'):
-            try:
-                # Tady je ta změna: vynutíme přesný název modelu
-                model = genai.GenerativeModel(model_name='gemini-1.5-flash')
-                
-                # Posíláme seznam: [textový prompt, obrázek]
-                response = model.generate_content([
-                    "Přečti tyhle ručně psané poznámky v češtině. Udělej z nich stručný výtah v odrážkách, vypiš 3 klíčové pojmy a navrhni 3 otázky na procvičení.", 
-                    img
-                ])
-                
-                st.markdown("---")
-                st.subheader("📝 Výsledek od AI:")
-                if response.text:
-                    st.write(response.text)
-                else:
-                    st.write("AI přečetla obrázek, ale nevygenerovala žádný text.")
-                
-            except Exception as e:
-                # Detailní výpis chyby, abychom věděli, co přesně se děje
-                st.error(f"Chyba: {e}") 
+    if btn_summary:
+        with st.spinner('Připravuji výtah...'):
+            response = model.generate_content(f"Udělej stručný a přehledný výtah z tohoto textu: {user_text}")
+            st.success("Hotovo!")
+            st.write(response.text)
+
+    if btn_quiz:
+        with st.spinner('Generuji otázky...'):
+            response = model.generate_content(f"Vytvoř 5 testových otázek (včetně správných odpovědí) na základě tohoto textu: {user_text}")
+            st.success("Kvíz je na světě!")
+            st.write(response.text)
+
+    if btn_points:
+        with st.spinner('Hledám klíčové pojmy...'):
+            response = model.generate_content(f"Vypiš nejdůležitější pojmy a jejich stručné vysvětlení z tohoto textu: {user_text}")
+            st.success("Klíčové body:")
+            st.write(response.text)
+else:
+    if btn_summary or btn_quiz or btn_points:
+        st.warning("Nejdříve do pole vlož nějaký text!")
