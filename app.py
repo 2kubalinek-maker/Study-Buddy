@@ -22,7 +22,7 @@ with col3:
     btn_points = st.button("🏷️ Klíčové body")
 
 if user_text:
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-pro')
     
     if btn_summary:
         with st.spinner('Připravuji výtah...'):
